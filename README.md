@@ -7,7 +7,7 @@ This tool allows to export Verse generative project files and metadata from Ethe
 ## Installation
 
 1. Clone github repository
-2. Run `yarn` to wdownload dependencies
+2. Run `yarn` to download dependencies
 
 ## Usage
 
