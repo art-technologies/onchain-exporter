@@ -1,0 +1,30 @@
+{
+  "name": "verse-onchain",
+  "version": "0.0.1",
+  "description": "Download Verse on-chain projects to your computer",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "gen-contract": "typechain --target ethers-v5 --out-dir ./generated/contracts ./abi/**/*.json",
+    "gen-proto": "pbjs --ts ./generated/pb/payload.ts ./docs/payload.proto"
+  },
+  "author": "Verse Works",
+  "website": "https://verse.works",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@typechain/ethers-v5": "^11.1.2",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/google-protobuf": "^3.15.12",
+    "@types/node": "^20.11.24",
+    "dotenv": "^16.4.5",
+    "ethers": "5.7.2",
+    "pako": "^2.1.0",
+    "typechain": "^8.3.2",
+    "typescript": "^5.3.3",
+    "@types/pako": "^2.0.3",
+    "commander": "^12.0.0",
+    "pbjs": "^0.0.14",
+    "table": "^6.8.1"
+  }
+}
