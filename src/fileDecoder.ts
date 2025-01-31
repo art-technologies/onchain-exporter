@@ -31,8 +31,8 @@ export async function saveFiles(collection: LondonTokenBase, provider: ethers.pr
       console.log("Detected dependencies, resolving...")
       const dependencies = parseAndValidateJson(decodedContent)
       for (const dependency of dependencies) {
-        if (process.env.DEPENDECY_RESOLVE_TYPE !== "artblocks-dependency-registry") {
-          throw "Please check if you have env variable for DEPENDECY_RESOLVE_TYPE"
+        if (process.env.DEPENDENCY_RESOLVE_TYPE !== "artblocks-dependency-registry") {
+          throw "Please check if you have env variable for DEPENDENCY_RESOLVE_TYPE"
         }
         const dependencyContent = await getCDNLinkForDependency(dependency.alias, provider)
         await fs.promises.writeFile(path.join(contentsPath, dependency.filePath), dependencyContent);

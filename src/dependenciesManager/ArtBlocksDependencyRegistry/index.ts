@@ -5,7 +5,7 @@ export async function getCDNLinkForDependency(
     dependencyName: string,
     provider: ethers.providers.JsonRpcProvider
 ) {
-    const dependencyRegistryContract = process.env.DEPENDECY_RESOLVE_TYPE__ARTBLOCKS__REGISTRY_CONTRACT
+    const dependencyRegistryContract = process.env.DEPENDENCY_RESOLVE_TYPE__ARTBLOCKS__REGISTRY_CONTRACT
     if (typeof dependencyRegistryContract === "undefined") {
         throw "dependencyRegistryContract should be defined!"
     }
