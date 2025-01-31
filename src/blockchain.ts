@@ -25,12 +25,12 @@ export async function exportFromBlockchain(
   const description = await collection.projectDescription();
   const payload = await collection._payloads(tokenId);
 
-  if (payload === "") {
-    throw new Error("Token ID not found");
-  }
+  // if (payload === "") {
+  //   throw new Error("Token ID not found");
+  // }
 
   const decodedPayload = decodePayload(payload);
-  await saveFiles(collection);
+  await saveFiles(collection, provider);
 
   const projectData = [
     ["Project", ""],
