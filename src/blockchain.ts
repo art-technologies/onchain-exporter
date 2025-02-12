@@ -30,7 +30,7 @@ export async function exportFromBlockchain(
   }
 
   const decodedPayload = decodePayload(payload);
-  await saveFiles(collection);
+  await saveFiles(collection, provider);
 
   const projectData = [
     ["Project", ""],
