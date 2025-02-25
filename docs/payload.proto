@@ -3,4 +3,10 @@ syntax = "proto3";
 message Metadata {
   bytes hash = 1;
   string title = 2;
+  repeated Parameter params = 3;
+}
+
+message Parameter {
+  string name = 1;
+  string value = 2;
 }
