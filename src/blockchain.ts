@@ -45,6 +45,7 @@ export async function exportFromBlockchain(
     ["Token ID", tokenId],
     ["Title", decodedPayload.title],
     ["Hash", decodedPayload.hash],
+    ["Params", JSON.stringify(decodedPayload.params)],
   ];
 
   printData(projectData);

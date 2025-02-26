@@ -1,6 +1,7 @@
 export interface Metadata {
   hash?: Uint8Array;
   title?: string;
+  params?: Parameter[];
 }
 
 export function encodeMetadata(message: Metadata): Uint8Array {
@@ -22,6 +23,19 @@ function _encodeMetadata(message: Metadata, bb: ByteBuffer): void {
   if ($title !== undefined) {
     writeVarint32(bb, 18);
     writeString(bb, $title);
+  }
+
+  // repeated Parameter params = 3;
+  let array$params = message.params;
+  if (array$params !== undefined) {
+    for (let value of array$params) {
+      writeVarint32(bb, 26);
+      let nested = popByteBuffer();
+      _encodeParameter(value, nested);
+      writeVarint32(bb, nested.limit);
+      writeByteBuffer(bb, nested);
+      pushByteBuffer(nested);
+    }
   }
 }
 
@@ -48,6 +62,76 @@ function _decodeMetadata(bb: ByteBuffer): Metadata {
       // optional string title = 2;
       case 2: {
         message.title = readString(bb, readVarint32(bb));
+        break;
+      }
+
+      // repeated Parameter params = 3;
+      case 3: {
+        let limit = pushTemporaryLength(bb);
+        let values = message.params || (message.params = []);
+        values.push(_decodeParameter(bb));
+        bb.limit = limit;
+        break;
+      }
+
+      default:
+        skipUnknownField(bb, tag & 7);
+    }
+  }
+
+  return message;
+}
+
+export interface Parameter {
+  name?: string;
+  value?: string;
+}
+
+export function encodeParameter(message: Parameter): Uint8Array {
+  let bb = popByteBuffer();
+  _encodeParameter(message, bb);
+  return toUint8Array(bb);
+}
+
+function _encodeParameter(message: Parameter, bb: ByteBuffer): void {
+  // optional string name = 1;
+  let $name = message.name;
+  if ($name !== undefined) {
+    writeVarint32(bb, 10);
+    writeString(bb, $name);
+  }
+
+  // optional string value = 2;
+  let $value = message.value;
+  if ($value !== undefined) {
+    writeVarint32(bb, 18);
+    writeString(bb, $value);
+  }
+}
+
+export function decodeParameter(binary: Uint8Array): Parameter {
+  return _decodeParameter(wrapByteBuffer(binary));
+}
+
+function _decodeParameter(bb: ByteBuffer): Parameter {
+  let message: Parameter = {} as any;
+
+  end_of_message: while (!isAtEnd(bb)) {
+    let tag = readVarint32(bb);
+
+    switch (tag >>> 3) {
+      case 0:
+        break end_of_message;
+
+      // optional string name = 1;
+      case 1: {
+        message.name = readString(bb, readVarint32(bb));
+        break;
+      }
+
+      // optional string value = 2;
+      case 2: {
+        message.value = readString(bb, readVarint32(bb));
         break;
       }
 
