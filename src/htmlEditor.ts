@@ -1,28 +1,46 @@
-const fs = require("fs");
+import { Buffer } from 'buffer';
+import { IFileAdapter } from './core/OnChainExporter';
 
-export const injectPayload = (filePath: string, payload: any) => {
-  fs.readFile(filePath, "utf8", (err: any, data: any) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
+/**
+ * Cross-environment base64 encoding:
+ *   - Uses "btoa" in browsers
+ *   - Uses "Buffer" in Node
+ */
+function base64Encode(str: string): string {
+  // If "window" or "window.btoa" doesn't exist, we assume Node
+  if (typeof window !== 'undefined' && typeof window.btoa === 'function') {
+    return window.btoa(str);
+  } else {
+    return Buffer.from(str, 'utf-8').toString('base64');
+  }
+}
 
-    let result = data.replace(
+/**
+ * "injectPayload" in an adapter-based style.
+ */
+export async function injectPayload(
+  filePath: string,
+  payload: unknown,
+  fileAdapter: IFileAdapter
+) {
+  try {
+    // read file
+    const fileContents = await fileAdapter.readFile(filePath);
+    const str = fileContents.toString('utf8');
+
+    // replace
+    const replaced = str.replace(
       /params.get\("payload"\);/,
-      `"${btoa(JSON.stringify(payload))}"`
+      `"${base64Encode(JSON.stringify(payload))}"`
     );
 
-    fs.writeFile(
+    // write
+    await fileAdapter.writeFile(
       filePath,
-      result,
-      "utf8",
-      (err: NodeJS.ErrnoException | null) => {
-        if (err) {
-          console.error(err);
-        } else {
-          console.log(`Project saved at ${filePath}`);
-        }
-      }
+      Buffer.from(replaced, 'utf8')
     );
-  });
-};
+    console.log(`Project saved at ${filePath}`);
+  } catch (err) {
+    console.error(err);
+  }
+}

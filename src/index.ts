@@ -1,5 +1,10 @@
 import { exportFromBlockchain } from "./blockchain";
 import { Command } from "commander";
+import { NodeFsAdapter } from "./adapters/NodeFsAdapter";
+import { NodeOutputProvider } from "./printer";
+import "dotenv/config";
+import { ExportConfig } from "./blockchain";
+
 const program = new Command();
 
 type Options = {
@@ -31,7 +36,16 @@ async function main() {
   }
 
   try {
-    await exportFromBlockchain(contract, token);
+    const fileAdapter = new NodeFsAdapter();
+    const outputProvider = new NodeOutputProvider();
+
+    const config: ExportConfig = {
+      ethRpcNode: process.env.ETH_RPC_NODE || "http://localhost:8545",
+      dependencyResolveType: process.env.DEPENDENCY_RESOLVE_TYPE || "",
+      artblocksRegistryContract: process.env.DEPENDENCY_RESOLVE_TYPE__ARTBLOCKS__REGISTRY_CONTRACT || "",
+    };
+
+    await exportFromBlockchain(contract, token, fileAdapter, outputProvider, config);
   } catch (error) {
     console.error("Error exporting from blockchain", error);
   }

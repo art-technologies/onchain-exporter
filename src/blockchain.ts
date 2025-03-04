@@ -2,17 +2,28 @@ import { ethers } from "ethers";
 import { LondonTokenBase__factory } from "../generated/contracts";
 import { decodePayload } from "./protoDecode";
 import { contentsPath, saveFiles } from "./fileDecoder";
-import { printData } from "./printer";
+import { IOutputProvider } from "./printer";
 import { injectPayload } from "./htmlEditor";
 import "dotenv/config";
+import { IFileAdapter } from './core/OnChainExporter';
+
+/**
+ * Interface holding former env references.
+ */
+export interface ExportConfig {
+  ethRpcNode: string;
+  dependencyResolveType: string;
+  artblocksRegistryContract: string;
+}
 
 export async function exportFromBlockchain(
   contractAddress: string,
-  tokenId: string
+  tokenId: string,
+  fileAdapter: IFileAdapter,
+  outputProvider: IOutputProvider,
+  config: ExportConfig
 ) {
-  const provider = new ethers.providers.JsonRpcProvider(
-    process.env.ETH_RPC_NODE
-  );
+  const provider = new ethers.providers.JsonRpcProvider(config.ethRpcNode);
   await provider.ready;
   const collection = LondonTokenBase__factory.connect(
     contractAddress,
@@ -30,7 +41,13 @@ export async function exportFromBlockchain(
   }
 
   const decodedPayload = decodePayload(payload);
-  await saveFiles(collection, provider);
+  await saveFiles(
+    collection,
+    provider,
+    fileAdapter,
+    config.dependencyResolveType,
+    config.artblocksRegistryContract
+  );
 
   const projectData = [
     ["Project", ""],
@@ -48,8 +65,8 @@ export async function exportFromBlockchain(
     ["Params", JSON.stringify(decodedPayload.params)],
   ];
 
-  printData(projectData);
-  printData(tokenData);
+  outputProvider.printData(projectData);
+  outputProvider.printData(tokenData);
 
-  injectPayload(`${contentsPath}/index.html`, decodedPayload);
+  await injectPayload(`${contentsPath}/index.html`, decodedPayload, fileAdapter);
 }
