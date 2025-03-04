@@ -3,3 +3,4 @@ project/*
 .env
 dist/*
 .DS_Store
+.idea

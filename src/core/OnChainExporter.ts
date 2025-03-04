@@ -7,24 +7,3 @@ export interface IFileAdapter {
   writeFile(path: string, data: Buffer): Promise<void>;
   // Add more methods if needed
 }
-
-export class OnChainExporter {
-  private fileAdapter: IFileAdapter;
-
-  constructor(fileAdapter: IFileAdapter) {
-    this.fileAdapter = fileAdapter;
-  }
-
-  /**
-   * Example method: "exportToken". 
-   * (Replace with your actual on-chain export logic.)
-   */
-  public async exportToken(path: string, tokenData: Buffer): Promise<void> {
-    // Use the adapter to write the token data
-    await this.fileAdapter.writeFile(path, tokenData);
-
-    // If you need to read data:
-    // const readResult = await this.fileAdapter.readFile(path);
-    // ...
-  }
-} 
