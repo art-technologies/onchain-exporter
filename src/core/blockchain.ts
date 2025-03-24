@@ -3,7 +3,7 @@ import { LondonTokenBase__factory } from "../../generated/contracts";
 import { decodePayload } from "./protoDecode";
 import { contentsPath, saveFiles } from "./fileDecoder";
 import { IFileAdapter, IOutputProvider, ExportConfig } from "./OnChainExporter";
-import { injectPayload } from "../htmlEditor";
+import { injectPayload } from "./htmlEditor";
 
 export async function exportFromBlockchain(
   contractAddress: string,
