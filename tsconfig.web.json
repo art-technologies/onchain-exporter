@@ -1,8 +1,22 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "outDir": "dist/web"
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": ["vite/client"]
   },
-  "include": ["src/web/**/*", "src/core/**/*", "src/adapters/browser/**/*"]
+  "include": ["src/web"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 } 
