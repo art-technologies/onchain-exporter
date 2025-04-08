@@ -5,8 +5,8 @@ import { ethers } from 'ethers';
  * In Node, you'll implement this using fs; in the browser, you might store it in memory or localStorage.
  */
 export interface IFileAdapter {
-  readFile(path: string): Promise<Buffer>;
-  writeFile(path: string, data: Buffer): Promise<void>;
+  readFile(path: string): Promise<Uint8Array>;
+  writeFile(path: string, data: Uint8Array): Promise<void>;
   // Add more methods if needed
 }
 

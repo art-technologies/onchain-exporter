@@ -1,9 +1,9 @@
 import { IFileAdapter, IOutputProvider } from '../../core/OnChainExporter';
 
 export class WebFsAdapter implements IFileAdapter {
-  private files: Map<string, Buffer> = new Map();
+  private files: Map<string, Uint8Array> = new Map();
 
-  async readFile(path: string): Promise<Buffer> {
+  async readFile(path: string): Promise<Uint8Array> {
     const file = this.files.get(path);
     if (!file) {
       throw new Error(`File not found: ${path}`);
@@ -11,8 +11,12 @@ export class WebFsAdapter implements IFileAdapter {
     return file;
   }
 
-  async writeFile(path: string, data: Buffer): Promise<void> {
+  async writeFile(path: string, data: Uint8Array): Promise<void> {
     this.files.set(path, data);
+  }
+
+  public printAllFiles() {
+    console.log(this.files);
   }
 }
 

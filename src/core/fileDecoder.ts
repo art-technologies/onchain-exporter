@@ -3,7 +3,7 @@ import { inflate } from "pako";
 import { LondonTokenBase } from "../../generated/contracts";
 import { IFileAdapter } from "./OnChainExporter";
 import { getCDNLinkForDependency } from "../dependenciesManager/ArtBlocksDependencyRegistry";
-import * as path from "path";
+import { joinPath } from "../utils/platform";
 
 export const contentsPath = "./project";
 export const dependenciesFile = "dependencies.json";
@@ -50,15 +50,15 @@ export async function saveFiles(
           artblocksRegistryContract
         );
         await fileAdapter.writeFile(
-          path.join(contentsPath, dependency.filePath),
-          Buffer.from(dependencyContent, "utf-8")
+          joinPath(contentsPath, dependency.filePath),
+          new TextEncoder().encode(dependencyContent)
         );
       }
     }
 
     await fileAdapter.writeFile(
-      path.join(contentsPath, file),
-      Buffer.from(decodedContent, "utf-8")
+      joinPath(contentsPath, file),
+      new TextEncoder().encode(decodedContent)
     );
   }
 } 
