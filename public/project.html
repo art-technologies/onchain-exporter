@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Viewer</title>
+    <script>
+        // Wait for the loadFileSystem message
+        window.addEventListener('message', async (event) => {
+            if (event.data.type === 'loadFileSystem') {
+                const fileSystem = event.data.filesystem;
+                
+                // Register service worker
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const registration = await navigator.serviceWorker.register('/service-worker.js');
+                        console.log('ServiceWorker registration successful');
+                        
+                        // Send filesystem data to service worker
+                        registration.active?.postMessage({
+                            type: 'SET_FILESYSTEM',
+                            filesystem: fileSystem
+                        });
+                        
+                        // Load index.html from the filesystem
+                        if (fileSystem['/index.html']) {
+                            document.documentElement.innerHTML = fileSystem['/index.html'];
+                        } else {
+                            console.error('index.html not found in filesystem');
+                        }
+                    } catch (error) {
+                        console.error('ServiceWorker registration failed:', error);
+                    }
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="loading">Loading project...</div>
+</body>
+</html> 

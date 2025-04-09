@@ -1,6 +1,8 @@
 // Service worker for handling filesystem requests
 const CACHE_NAME = 'onchain-exporter-cache-v1';
 
+console.log("SERVICE WORKER DEBUG 1")
+
 // This will be populated by the main application
 let fileSystem: { [key: string]: string } = {};
 
@@ -14,6 +16,7 @@ self.addEventListener('message', (event: MessageEvent) => {
 self.addEventListener('fetch', (event: FetchEvent) => {
   const url = new URL(event.request.url);
   const path = url.pathname;
+  console.log("SERVICE WORKER DEBUG", path)
 
   // Check if we have this file in our filesystem
   if (fileSystem[path]) {

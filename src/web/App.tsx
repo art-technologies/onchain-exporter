@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useRef, useEffect } from 'react';
 import { ExportConfig } from '../core/OnChainExporter';
 import { WebFsAdapter, WebOutputProvider } from '../adapters/web';
 import { exportFromBlockchain } from '../core/blockchain';
@@ -10,10 +10,12 @@ function App() {
     artblocksRegistryContract: '',
   });
   const [iframeSrc, setIframeSrc] = useState<string>('');
-  const [contractAddress, setContractAddress] = useState<string>('');
-  const [tokenId, setTokenId] = useState<string>('');
+  const [contractAddress, setContractAddress] = useState<string>('0xbeed938770b07adf60ddacc551763ac76e0e5566');
+  const [tokenId, setTokenId] = useState<string>('115854877');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [verboseMode, setVerboseMode] = useState<boolean>(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const fsAdapterRef = useRef<WebFsAdapter | null>(null);
 
   const log = (message: string, data?: any) => {
     if (verboseMode) {
@@ -54,6 +56,7 @@ function App() {
       });
       
       const fsAdapter = new WebFsAdapter();
+      fsAdapterRef.current = fsAdapter;
       const outputProvider = new WebOutputProvider();
       
       log('Initialized adapters', {
@@ -73,10 +76,8 @@ function App() {
 
       log('Export completed successfully');
       
-      // Get the path to the generated HTML file
-      const htmlPath = `/artwork/${contractAddress}/${tokenId}/index.html`;
-      log('Setting iframe source', { htmlPath });
-      setIframeSrc(htmlPath);
+      // Set the project.html as the iframe source
+      setIframeSrc('/project.html');
     } catch (error) {
       logError(error, 'export process');
     } finally {
@@ -84,6 +85,30 @@ function App() {
       log('Export process finished');
     }
   };
+
+  // Send filesystem data to iframe when it loads
+  useEffect(() => {
+    if (iframeRef.current && fsAdapterRef.current) {
+      const iframe = iframeRef.current;
+      const fsAdapter = fsAdapterRef.current;
+      
+      const handleIframeLoad = () => {
+        // Convert Map to object for postMessage
+        const filesystem: { [key: string]: string } = {};
+        fsAdapter['files'].forEach((value, key) => {
+          filesystem[key] = new TextDecoder().decode(value);
+        });
+        
+        iframe.contentWindow?.postMessage({
+          type: 'loadFileSystem',
+          filesystem
+        }, '*');
+      };
+
+      iframe.addEventListener('load', handleIframeLoad);
+      return () => iframe.removeEventListener('load', handleIframeLoad);
+    }
+  }, [iframeSrc]);
 
   return (
     <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '20px' }}>
@@ -192,6 +217,7 @@ function App() {
       <div>
         {iframeSrc && (
           <iframe
+            ref={iframeRef}
             src={iframeSrc}
             style={{ width: '100%', height: '100%', border: 'none' }}
             title="Artwork Preview"
