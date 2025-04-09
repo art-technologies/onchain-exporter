@@ -1,4 +1,5 @@
 import { IFileAdapter } from './OnChainExporter';
+import { stringToBytes } from '../utils/stringEncoding';
 
 export async function injectPayload(
   filePath: string,
@@ -7,7 +8,9 @@ export async function injectPayload(
 ) {
   try {
     const fileContents = await fileAdapter.readFile(filePath);
-    const str = fileContents.toString('utf8');
+    const str = typeof fileContents === 'string' 
+      ? fileContents 
+      : new TextDecoder().decode(fileContents);
 
     const replaced = str.replace(
       /params.get\("payload"\);/,
@@ -16,7 +19,7 @@ export async function injectPayload(
 
     await fileAdapter.writeFile(
       filePath,
-      Buffer.from(replaced, 'utf8')
+      stringToBytes(replaced, 'utf8')
     );
     console.log(`Project saved at ${filePath}`);
   } catch (err) {
