@@ -10,10 +10,12 @@ function App() {
     artblocksRegistryContract: '0x37861f95882ACDba2cCD84F5bFc4598e2ECDDdAF',
   });
   const [iframeSrc, setIframeSrc] = useState<string>('');
-  const [contractAddress, setContractAddress] = useState<string>('0xbeed938770b07adf60ddacc551763ac76e0e5566');
-  const [tokenId, setTokenId] = useState<string>('115854877');
+  const [contractAddress, setContractAddress] = useState<string>('0x5d6a7196d14408278d40ffdfe4cb697a6799ca88');
+  const [tokenId, setTokenId] = useState<string>('6');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [verboseMode, setVerboseMode] = useState<boolean>(false);
+  const [showAdditionalOptions, setShowAdditionalOptions] = useState<boolean>(false);
+  const [aspectRatio, setAspectRatio] = useState<number>(1);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const fsAdapterRef = useRef<WebFsAdapter | null>(null);
 
@@ -168,27 +170,6 @@ function App() {
           style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
         />
         
-        <select
-          value={config.dependencyResolveType}
-          onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-            setConfig({ ...config, dependencyResolveType: e.target.value as 'ipfs' | 'http' });
-            log('Dependency resolve type updated', { value: e.target.value });
-          }}
-          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-        >
-          <option value="ipfs">artblocks-dependency-registry</option>
-        </select>
-        
-        <input
-          placeholder="ArtBlocks Registry Contract"
-          value={config.artblocksRegistryContract}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            setConfig({ ...config, artblocksRegistryContract: e.target.value });
-            log('ArtBlocks Registry Contract updated', { value: e.target.value });
-          }}
-          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-        />
-        
         <input
           placeholder="Smart Contract Address"
           value={contractAddress}
@@ -208,6 +189,81 @@ function App() {
           }}
           style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
         />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label htmlFor="aspectRatio" style={{ minWidth: '100px' }}>Aspect Ratio:</label>
+          <input
+            type="number"
+            id="aspectRatio"
+            value={aspectRatio}
+            min="0.1"
+            max="10"
+            step="0.1"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              const value = parseFloat(e.target.value);
+              if (!isNaN(value) && value > 0) {
+                setAspectRatio(value);
+                log('Aspect ratio updated', { value });
+              }
+            }}
+            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100px' }}
+          />
+        </div>
+
+        {/* Additional Options Section */}
+        <div style={{ marginTop: '10px' }}>
+          <button
+            onClick={() => setShowAdditionalOptions(!showAdditionalOptions)}
+            style={{
+              padding: '8px',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              width: '100%',
+              textAlign: 'left',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+          >
+            <span>Additional Options</span>
+            <span style={{ transform: showAdditionalOptions ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+          </button>
+          
+          {showAdditionalOptions && (
+            <div style={{ 
+              marginTop: '10px', 
+              padding: '10px', 
+              border: '1px solid #eee', 
+              borderRadius: '4px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px'
+            }}>
+              <select
+                value={config.dependencyResolveType}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                  setConfig({ ...config, dependencyResolveType: e.target.value as 'ipfs' | 'http' });
+                  log('Dependency resolve type updated', { value: e.target.value });
+                }}
+                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+              >
+                <option value="ipfs">artblocks-dependency-registry</option>
+              </select>
+              
+              <input
+                placeholder="ArtBlocks Registry Contract"
+                value={config.artblocksRegistryContract}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setConfig({ ...config, artblocksRegistryContract: e.target.value });
+                  log('ArtBlocks Registry Contract updated', { value: e.target.value });
+                }}
+                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+              />
+            </div>
+          )}
+        </div>
         
         <button 
           onClick={handleSubmit} 
@@ -242,12 +298,24 @@ function App() {
       </div>
       
       {/* Right Panel */}
-      <div>
+      <div style={{ 
+        position: 'relative',
+        width: '100%',
+        paddingTop: `${100 / aspectRatio}%`,
+        backgroundColor: '#f5f5f5'
+      }}>
         {iframeSrc && (
           <iframe
             ref={iframeRef}
             src={iframeSrc}
-            style={{ width: '100%', height: '100%', border: 'none' }}
+            style={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              border: 'none'
+            }}
             title="Artwork Preview"
           />
         )}
