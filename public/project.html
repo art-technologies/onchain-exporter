@@ -7,36 +7,25 @@
     <script>
         // Wait for the loadFileSystem message
         window.addEventListener('message', async (event) => {
-            if (event.data.type === 'loadFileSystem') {
+            if (event.data.type === 'SET_FILESYSTEM') {
                 const fileSystem = event.data.filesystem;
                 
                 // Register service worker
                 if ('serviceWorker' in navigator) {
-                    try {
-                        const registration = await navigator.serviceWorker.register('/service-worker.js');
-                        console.log('ServiceWorker registration successful');
-                        
-                        // Send filesystem data to service worker
-                        registration.active?.postMessage({
-                            type: 'SET_FILESYSTEM',
-                            filesystem: fileSystem
-                        });
-                        
-                        // Load index.html from the filesystem
-                        if (fileSystem['/index.html']) {
-                            document.documentElement.innerHTML = fileSystem['/index.html'];
-                        } else {
-                            console.error('index.html not found in filesystem');
-                        }
-                    } catch (error) {
-                        console.error('ServiceWorker registration failed:', error);
-                    }
+                    const registration = await navigator.serviceWorker.register('/service-worker.js');
+                    console.log('ServiceWorker registration successful');
+                    
+                    // Send filesystem data to service worker
+                    registration.active?.postMessage({
+                        type: 'SET_FILESYSTEM',
+                        filesystem: fileSystem
+                    });
                 }
             }
         });
     </script>
 </head>
 <body>
-    <div id="loading">Loading project...</div>
+    <iframe id="projectFrame" src="/project/index.html" style="width: 100%; height: 100vh; border: none;"></iframe>
 </body>
 </html> 

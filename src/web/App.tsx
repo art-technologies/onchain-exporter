@@ -5,9 +5,9 @@ import { exportFromBlockchain } from '../core/blockchain';
 
 function App() {
   const [config, setConfig] = useState<ExportConfig>({
-    ethRpcNode: '',
-    dependencyResolveType: 'ipfs',
-    artblocksRegistryContract: '',
+    ethRpcNode: 'https://ethereum-rpc.publicnode.com',
+    dependencyResolveType: 'artblocks-dependency-registry',
+    artblocksRegistryContract: '0x37861f95882ACDba2cCD84F5bFc4598e2ECDDdAF',
   });
   const [iframeSrc, setIframeSrc] = useState<string>('');
   const [contractAddress, setContractAddress] = useState<string>('0xbeed938770b07adf60ddacc551763ac76e0e5566');
@@ -16,6 +16,19 @@ function App() {
   const [verboseMode, setVerboseMode] = useState<boolean>(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const fsAdapterRef = useRef<WebFsAdapter | null>(null);
+
+  // Register service worker on component mount
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('ServiceWorker registration successful');
+        })
+        .catch(error => {
+          console.error('ServiceWorker registration failed:', error);
+        });
+    }
+  }, []);
 
   const log = (message: string, data?: any) => {
     if (verboseMode) {
@@ -76,8 +89,24 @@ function App() {
 
       log('Export completed successfully');
       
+      // Convert Map to object for postMessage
+      const filesystem: { [key: string]: string } = {};
+      fsAdapter['files'].forEach((value, key) => {
+        filesystem[key] = new TextDecoder().decode(value);
+      });
+
+      // Send filesystem data to service worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(registration => {
+          registration.active?.postMessage({
+            type: 'SET_FILESYSTEM',
+            filesystem
+          });
+        });
+      }
+
       // Set the project.html as the iframe source
-      setIframeSrc('/project.html');
+      setIframeSrc('http://localhost:3000/project/index.html');
     } catch (error) {
       logError(error, 'export process');
     } finally {
@@ -147,8 +176,7 @@ function App() {
           }}
           style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
         >
-          <option value="ipfs">IPFS</option>
-          <option value="http">HTTP</option>
+          <option value="ipfs">artblocks-dependency-registry</option>
         </select>
         
         <input

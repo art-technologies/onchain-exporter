@@ -5,7 +5,7 @@ import { IFileAdapter } from "./OnChainExporter";
 import { getCDNLinkForDependency } from "../dependenciesManager/ArtBlocksDependencyRegistry";
 import { joinPath } from "../utils/platform";
 
-export const contentsPath = "";
+export const contentsPath = "/project";
 export const dependenciesFile = "dependencies.json";
 
 export async function decodeFileContents(chunks: Uint8Array[]) {
