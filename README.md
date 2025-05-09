@@ -9,6 +9,12 @@ This tool allows to export Verse generative project files and metadata from Ethe
 1. Clone github repository
 2. Run `yarn` to download dependencies
 
+### To build CLI version
+```bash
+yarn build:cli
+yarn run:cli --contract 0xbeed938770b07adf60ddacc551763ac76e0e5566 --token 115854877
+```
+
 ## Usage
 
 ### Export files by contract address and token Id
@@ -61,3 +67,7 @@ Project saved at ./project/index.html
 Use `yarn start --help` for more details.
 
 Contact us at support[@]verse.works.
+
+## Test Suites:
+1. `yarn build:cli && yarn run:cli --contract 0xbeed938770b07adf60ddacc551763ac76e0e5566 --token 115854877`
+2. `yarn build:cli && yarn run:cli --contract 0x5d6a7196d14408278d40ffdfe4cb697a6799ca88 --token 3`

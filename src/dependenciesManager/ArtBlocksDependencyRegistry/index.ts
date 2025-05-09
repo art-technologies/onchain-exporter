@@ -3,10 +3,10 @@ import { ethers } from "ethers";
 
 export async function getCDNLinkForDependency(
     dependencyName: string,
-    provider: ethers.providers.JsonRpcProvider
+    provider: ethers.providers.JsonRpcProvider,
+    dependencyRegistryContract: string
 ) {
-    const dependencyRegistryContract = process.env.DEPENDENCY_RESOLVE_TYPE__ARTBLOCKS__REGISTRY_CONTRACT
-    if (typeof dependencyRegistryContract === "undefined") {
+    if (!dependencyRegistryContract) {
         throw "dependencyRegistryContract should be defined!"
     }
 

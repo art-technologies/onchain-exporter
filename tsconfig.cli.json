@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist/cli"
+  },
+  "include": [
+    "src/cli/**/*",
+    "src/core/**/*",
+    "src/adapters/node/**/*",
+    "generated/**/*"
+  ]
+} 

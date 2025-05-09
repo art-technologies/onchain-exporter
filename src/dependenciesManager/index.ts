@@ -1,30 +1,36 @@
-import fs from 'fs';
-import Ajv from 'ajv';
+import Ajv, { ValidateFunction } from 'ajv';
 
-const schemaFilePath = "./src/dependenciesManager/dependencies.schema.json"
+/**
+ * Creates a validator function from a given JSON schema.
+ */
+export function createDependencyValidator(schemaJson: any): ValidateFunction {
+  // We'll compile your schema with Ajv from an in-memory string.
+  const ajv = new Ajv({ strictTuples: false });
+  return ajv.compile(schemaJson);
+}
 
-export function parseAndValidateJson(jsonString: string) {
-    let data;
+/**
+ * Validates JSON against a provided Ajv validator function.
+ */
+export function parseAndValidateJson(
+  jsonString: string,
+  validate: ValidateFunction
+) {
+  let data: unknown;
+  try {
+    data = JSON.parse(jsonString);
+  } catch (error) {
+    throw new Error('Invalid JSON string');
+  }
 
-    try {
-        data = JSON.parse(jsonString);
-    } catch (error) {
-        throw new Error('Invalid JSON string');
-    }
+  const valid = validate(data);
+  if (!valid) {
+    // Collect validation errors into a single message
+    const errors = validate.errors
+      ?.map((err) => `${err.instancePath} ${err.message}`)
+      .join(', ');
+    throw new Error(`JSON does not match the schema: ${errors}`);
+  }
 
-    const schemaFile = fs.readFileSync(schemaFilePath, 'utf8');
-    const schema = JSON.parse(schemaFile);
-
-    const ajv = new Ajv({ strictTuples: false });
-    const validate = ajv.compile(schema);
-    const valid = validate(data);
-    if (!valid) {
-        // Collect validation errors into a single message
-        const errors = validate.errors?.map(
-            (err) => `${err.instancePath} ${err.message}`
-        ).join(', ');
-        throw new Error(`JSON does not match the schema: ${errors}`);
-    }
-
-    return data;
+  return data;
 }
